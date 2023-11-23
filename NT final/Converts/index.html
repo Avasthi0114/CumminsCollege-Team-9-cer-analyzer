@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter</title>
+  <style>
+    body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #333;
+}
+
+label {
+  display: block;
+  margin: 10px 0 5px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #4caf50;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+#convertedAmount {
+  font-weight: bold;
+}
+
+.container {
+  max-width: 40px;
+  margin: 80px auto;
+  background-color: #fff;
+  padding: 80px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+  </style>
+</head>
+<body>
+
+  <h1>Currency Converter</h1>
+
+  <label for="amount">Amount in USD:</label>
+  <input type="number" id="amount" step="0.01" placeholder="Enter amount">
+
+  <label for="currency">Select currency:</label>
+  <select id="currency">
+    <!-- Options will be dynamically added using JavaScript -->
+  </select>
+
+  <label for="date">Select date:</label>
+  <input type="date" id="date">
+
+  <button onclick="convertCurrency()">Convert</button>
+
+  <h2>Converted Amount:</h2>
+  <p id="convertedAmount"></p>
+
+  <script>
+    // Function to populate the currency dropdown
+    function populateCurrencyDropdown(headers) {
+      const dropdown = document.getElementById('currency');
+
+      headers.slice(1).forEach(currency => {
+        const option = document.createElement('option');
+        option.value = currency;
+        option.textContent = currency;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // Function to convert currency
+    function convertCurrency() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const selectedCurrency = document.getElementById('currency').value;
+      const selectedDate = document.getElementById('date').value;
+
+      fetch('ymd merged.csv')
+        .then(response => response.text())
+        .then(csvData => {
+          const lines = csvData.split('\n');
+          const headers = lines[0].split(',');
+
+          // Find the index of USD column
+          const usdIndex = headers.indexOf('U.S. dollar   (USD)');
+
+          // Find the index of the selected currency column
+          const selectedCurrencyIndex = headers.indexOf(selectedCurrency);
+
+          // Find the index of the date column
+          const dateIndex = headers.indexOf('Date');
+
+          // Extract exchange rates for USD, selected currency, and the given date
+          const usdRates = [];
+          const selectedCurrencyRates = [];
+          for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].split(',');
+            const currentDate = line[dateIndex];
+            if (currentDate === selectedDate) {
+              usdRates.push(parseFloat(line[usdIndex]));
+              selectedCurrencyRates.push(parseFloat(line[selectedCurrencyIndex]));
+            }
+          }
+
+          // Check if exchange rates are available for the given date
+          if (usdRates.length === 0 || selectedCurrencyRates.length === 0) {
+            alert(`Exchange rates not available for the selected date: ${selectedDate}`);
+            return;
+          }
+
+          // Convert the given amount to the selected currency
+          const convertedAmount = (amount * selectedCurrencyRates[0]).toFixed(2);
+
+          // Display the result
+          const convertedAmountElement = document.getElementById('convertedAmount');
+          convertedAmountElement.textContent = `Converted Amount: ${convertedAmount} ${selectedCurrency}`;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Fetch the CSV file and populate the currency dropdown on page load
+    fetch('merged-csv-files.csv')
+      .then(response => response.text())
+      .then(csvData => {
+        const lines = csvData.split('\n');
+        const headers = lines[0].split(',');
+
+        populateCurrencyDropdown(headers);
+      })
+      .catch(error => console.error('Error:', error));
+  </script>
+
+</body>
+</html>
