@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Rate Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Exchange Rate Dashboard</h1>
+    </header>
+
+    <main>
+        <label for="currency1">Currency 1 (USD)</label>
+        <select id="currency1">
+            <option value="USD">USD</option>
+        </select>
+
+        <label for="currency2">Currency 2</label>
+        <select id="currency2"></select>
+
+        <label for="fileInput">Select CSV File:</label>
+        <input type="file" id="fileInput" accept=".csv">
+
+        <label for="duration">Select Duration</label>
+        <select id="duration">
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="quarterly">Quarterly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+
+        <!-- Add these elements inside the <main> section -->
+        <div id="exchangeRates">
+            <p id="highestRate"></p>
+            <p id="lowestRate"></p>
+        </div>
+
+        <button onclick="generateChart()">Generate Chart</button>
+
+        <div id="chartContainer"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/papaparse@5"></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script src="app.js"></script>
+    </main>
+</body>
+
+</html>
